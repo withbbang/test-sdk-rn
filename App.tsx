@@ -7,8 +7,16 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import WebView from 'react-native-webview';
-import {BackHandler, Dimensions, SafeAreaView, StyleSheet} from 'react-native';
+import {
+  BackHandler,
+  Dimensions,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native';
 import {handleCloseApp} from './src/utils/common';
+import SendIntentAndroid from 'react-native-send-intent';
 
 const deviceHeight = Dimensions.get('window').height;
 const deviceWidth = Dimensions.get('window').width;
@@ -34,15 +42,15 @@ const App = () => {
     return true;
   };
 
-  const customBackHandler = () => {
-    webview.current?.injectJavaScript(`
-        test();
-        
-        true;
-      `);
+  // const customBackHandler = () => {
+  //   webview.current?.injectJavaScript(`
+  //       test();
 
-    return true;
-  };
+  //       true;
+  //     `);
+
+  //   return true;
+  // };
 
   // useEffect(() => {
   //   const backHandler = BackHandler.addEventListener(
@@ -60,6 +68,7 @@ const App = () => {
     );
 
     return () => backHandler.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navState]);
 
   return (
@@ -67,10 +76,33 @@ const App = () => {
       <WebView
         style={styles.webview}
         ref={webview}
-        source={{uri: 'http://10.0.2.2:3000'}}
+        source={{uri: 'https://withbbang.github.io/test-sdk-react/'}}
         onNavigationStateChange={({url, canGoBack}) =>
           setNavState({url, canGoBack})
         }
+        originWhitelist={['*']}
+        onShouldStartLoadWithRequest={event => {
+          if (
+            event.url.startsWith('http://') ||
+            event.url.startsWith('https://') ||
+            event.url.startsWith('about:blank')
+          ) {
+            return true;
+          }
+
+          if (event.url.includes('intent')) {
+            SendIntentAndroid.openAppWithUri(event.url).catch((err: any) => {
+              ToastAndroid.show('앱 실행에 실패했습니다.', err);
+            });
+
+            return false;
+          } else {
+            Linking.openURL(event.url).catch((err: any) => {
+              ToastAndroid.show('앱 실행에 실패했습니다.', err);
+            });
+            return false;
+          }
+        }}
       />
     </SafeAreaView>
   );
