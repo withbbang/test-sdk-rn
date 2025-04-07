@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <queries>
-      <package android:name="com.kakao.talk" />
+      <package android:name="com.kakao.talk" /> <!-- 카카오 페이 -->
+      <package android:name="com.nhnent.payapp" /> <!-- 삼성페이, 페이코 -->
+      <package android:name="viva.republica.toss" /> <!-- 토스 -->
+      <package android:name="com.kbcard.cxh.appcard" /> <!-- KB -->
+      <package android:name="com.lotte.lpay" /> <!-- L.pay -->
+      <package android:name="com.lottemembers.android" /> <!-- L.POINT -->
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
