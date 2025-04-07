@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import {handleCloseApp} from './src/utils/common';
 import SendIntentAndroid from 'react-native-send-intent';
+import {ShouldStartLoadRequest} from 'react-native-webview/lib/WebViewTypes';
 
 const deviceHeight = Dimensions.get('window').height;
 const deviceWidth = Dimensions.get('window').width;
@@ -81,23 +82,25 @@ const App = () => {
           setNavState({url, canGoBack})
         }
         originWhitelist={['*']}
-        onShouldStartLoadWithRequest={event => {
+        onShouldStartLoadWithRequest={(event: ShouldStartLoadRequest) => {
+          const {url} = event;
+
           if (
-            event.url.startsWith('http://') ||
-            event.url.startsWith('https://') ||
-            event.url.startsWith('about:blank')
+            url.startsWith('http://') ||
+            url.startsWith('https://') ||
+            url.startsWith('about:blank')
           ) {
             return true;
           }
 
-          if (event.url.includes('intent')) {
-            SendIntentAndroid.openAppWithUri(event.url).catch((err: any) => {
+          if (url.includes('intent')) {
+            SendIntentAndroid.openAppWithUri(url).catch((err: any) => {
               ToastAndroid.show('앱 실행에 실패했습니다.', err);
             });
 
             return false;
           } else {
-            Linking.openURL(event.url).catch((err: any) => {
+            Linking.openURL(url).catch((err: any) => {
               ToastAndroid.show('앱 실행에 실패했습니다.', err);
             });
             return false;
